@@ -11,8 +11,7 @@
 6. Update the components
 7. Update the pipeline 
 8. Update the main.py
-9. Update the dvc.yaml
-10. app.py
+9. app.py
 
 # How to run?
 ### STEPS:
@@ -20,7 +19,7 @@
 Clone the repository
 
 ```bash
-https://github.com/krishnaik06/Kidney-Disease-Classification-Deep-Learning-Project
+https://github.com/piyxxx1/piyxxx1-Kidney-Diseases-Classification.git
 ```
 ### STEP 01- Create a conda environment after opening the repository
 
@@ -82,7 +81,7 @@ export MLFLOW_TRACKING_PASSWORD=778e6e53e302dd1978a6cffbb5109ee72f4df2dd
 
 ```
 
-## About MLflow & DVC
+## About MLflow
 
 MLflow
 
