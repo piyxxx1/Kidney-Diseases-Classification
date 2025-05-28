@@ -82,14 +82,6 @@ export MLFLOW_TRACKING_PASSWORD=778e6e53e302dd1978a6cffbb5109ee72f4df2dd
 
 ```
 
-
-### DVC cmd
-
-1. dvc init
-2. dvc repro
-3. dvc dag
-
-
 ## About MLflow & DVC
 
 MLflow
@@ -97,10 +89,3 @@ MLflow
  - Its Production Grade
  - Trace all of your expriements
  - Logging & taging your model
-
-
-DVC 
-
- - Its very lite weight for POC only
- - lite weight expriements tracker
- - It can perform Orchestration (Creating Pipelines)
