@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Object Classification</title>
+    <link rel="shortcut icon" href="https://fonts.gstatic.com/s/i/materialiconsoutlined/smart_toy/v14/24px.svg" type="image/svg+xml">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary-color: #764ba2;
+            --accent-color: #f093fb;
+            --success-color: #48bb78;
+            --warning-color: #ed8936;
+            --danger-color: #f56565;
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+            --bg-primary: #f7fafc;
+            --bg-secondary: #ffffff;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #ffffff, #f0f8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .main-card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 600px;
+        }
+
+        .upload-section {
+            padding: 2rem;
+            background: linear-gradient(145deg, #f8fafc, #ffffff);
+            border-right: 1px solid var(--border-color);
+        }
+
+        .results-section {
+            padding: 2rem;
+            background: var(--bg-secondary);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .upload-area {
+            position: relative;
+            background: white;
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background: linear-gradient(145deg, #f8fafc, #ffffff);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .upload-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            opacity: 0.7;
+        }
+
+        #photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: var(--radius-md);
+            display: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: var(--radius-lg);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 120px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary-color));
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color), #38a169);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            background: linear-gradient(135deg, #38a169, #2f855a);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results-container {
+            height: 400px;
+        }
+
+        .result-panel {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            overflow: auto;
+        }
+
+        .result-image {
+            background: white;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .result-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: var(--radius-md);
+        }
+
+        .result-data {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        }
+
+        .result-data pre {
+            margin: 0;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: var(--text-primary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-secondary);
+            gap: 1rem;
+        }
+
+        .empty-state i {
+            font-size: 2rem;
+            opacity: 0.5;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem 0.5rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .upload-section {
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .results-container {
+                height: auto;
+            }
+
+            .result-panel {
+                min-height: 200px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        /* Accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --text-primary: #f7fafc;
+                --text-secondary: #a0aec0;
+                --bg-primary: #1a202c;
+                --bg-secondary: #2d3748;
+                --border-color: #4a5568;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-robot"></i> AI Object Classification</h1>
+            <p>Upload an image to classify objects with AI</p>
+        </header>
+
+        <div class="main-card">
+            <div class="card-grid">
+                <div class="upload-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        Upload Image
+                    </h2>
+                    
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-placeholder" id="uploadPlaceholder">
+                            <i class="fas fa-image upload-icon"></i>
+                            <h3>Choose an image</h3>
+                            <p>Drag and drop an image here, or click upload</p>
+                        </div>
+                        <img src="" id="photo" alt="Uploaded image">
+                        <canvas style="display:none;" id="canvas"></canvas>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn btn-primary" id="uploadBtn">
+                            <i class="fas fa-upload"></i>
+                            Upload
+                        </button>
+                        <button type="button" class="btn btn-success" id="predictBtn" disabled>
+                            <i class="fas fa-brain"></i>
+                            Predict
+                        </button>
+                    </div>
+
+                    <input type="hidden" id="apiUrl" value="../predict">
+                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                </div>
+
+                <div class="results-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-chart-bar"></i>
+                        Prediction Results
+                    </h2>
+                    
+                    <div class="results-container">
+                        <div class="result-panel result-data" id="resultData">
+                            <div class="empty-state">
+                                <i class="fas fa-code"></i>
+                                <span>Classification results will appear here</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        class ObjectClassificationApp {
+            constructor() {
+                this.baseData = "";
+                this.initializeElements();
+                this.bindEvents();
+                this.hideLoading();
+            }
+
+            initializeElements() {
+                this.photo = document.getElementById('photo');
+                this.canvas = document.getElementById('canvas');
+                this.uploadBtn = document.getElementById('uploadBtn');
+                this.predictBtn = document.getElementById('predictBtn');
+                this.fileInput = document.getElementById('fileInput');
+                this.uploadArea = document.getElementById('uploadArea');
+                this.uploadPlaceholder = document.getElementById('uploadPlaceholder');
+                this.resultData = document.getElementById('resultData');
+                this.loadingOverlay = document.getElementById('loadingOverlay');
+                this.apiUrl = document.getElementById('apiUrl');
+            }
+
+            bindEvents() {
+                this.uploadBtn.addEventListener('click', () => this.handleUploadClick());
+                this.predictBtn.addEventListener('click', () => this.handlePredictClick());
+                this.fileInput.addEventListener('change', (e) => this.handleFileSelect(e));
+                
+                // Drag and drop functionality
+                this.uploadArea.addEventListener('dragover', (e) => this.handleDragOver(e));
+                this.uploadArea.addEventListener('drop', (e) => this.handleDrop(e));
+                this.uploadArea.addEventListener('click', () => this.handleUploadClick());
+            }
+
+            handleUploadClick() {
+                this.fileInput.click();
+            }
+
+            handlePredictClick() {
+                if (this.baseData) {
+                    this.sendPredictionRequest(this.baseData);
+                }
+            }
+
+            handleDragOver(e) {
+                e.preventDefault();
+                this.uploadArea.style.borderColor = 'var(--primary-color)';
+                this.uploadArea.style.backgroundColor = '#f8fafc';
+            }
+
+            handleDrop(e) {
+                e.preventDefault();
+                this.uploadArea.style.borderColor = 'var(--border-color)';
+                this.uploadArea.style.backgroundColor = '';
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0 && files[0].type.startsWith('image/')) {
+                    this.processImageFile(files[0]);
+                }
+            }
+
+            handleFileSelect(e) {
+                const file = e.target.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    this.processImageFile(file);
+                }
+            }
+
+            processImageFile(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.crossOrigin = 'Anonymous';
+                    img.onload = () => {
+                        // Create canvas and convert to base64
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        canvas.height = img.height;
+                        canvas.width = img.width;
+                        ctx.drawImage(img, 0, 0);
+                        this.baseData = canvas.toDataURL('image/jpeg', 1.0).replace(/^data:image.+;base64,/, '');
+                        
+                        // Update UI
+                        this.showImage(e.target.result);
+                        this.enablePredictButton();
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+
+            showImage(src) {
+                this.uploadPlaceholder.style.display = 'none';
+                this.photo.src = src;
+                this.photo.style.display = 'block';
+                this.uploadArea.style.border = 'none';
+                this.uploadArea.style.padding = '0';
+            }
+
+            enablePredictButton() {
+                this.predictBtn.disabled = false;
+                this.predictBtn.classList.add('pulse');
+                setTimeout(() => {
+                    this.predictBtn.classList.remove('pulse');
+                }, 2000);
+            }
+
+            showLoading() {
+                this.loadingOverlay.style.display = 'flex';
+            }
+
+            hideLoading() {
+                this.loadingOverlay.style.display = 'none';
+            }
+
+            sendPredictionRequest(base64Data) {
+                if (!base64Data) return;
+
+                const url = this.apiUrl.value;
+                this.showLoading();
+
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    cache: false,
+                    async: true,
+                    crossDomain: true,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    data: JSON.stringify({ image: base64Data }),
+                    success: (response) => {
+                        this.displayResults(response);
+                        this.hideLoading();
+                    },
+                    error: (xhr, status, error) => {
+                        this.displayError(error);
+                        this.hideLoading();
+                    }
+                });
+            }
+
+            displayResults(response) {
+                // Clear previous results
+                this.resultData.innerHTML = '';
+
+                try {
+                    // Display prediction data
+                    const pre = document.createElement('pre');
+                    pre.textContent = JSON.stringify(response[0], null, 2);
+                    this.resultData.appendChild(pre);
+
+                } catch (error) {
+                    this.displayError('Error parsing response');
+                }
+            }
+
+            displayError(error) {
+                this.resultData.innerHTML = `
+                    <div class="empty-state" style="color: var(--danger-color);">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Error: ${error}</span>
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize the application when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            new ObjectClassificationApp();
+        });
+    </script>
+</body>
+</html>
